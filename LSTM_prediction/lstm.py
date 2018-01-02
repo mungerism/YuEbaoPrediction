@@ -8,6 +8,8 @@ from keras.layers import LSTM
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 import pandas as pd
+from sklearn.externals import joblib
+import os
 
 # X is the number of passengers at a given time (t) and Y is the number of passengers at the next time (t + 1).
 # convert an array of values into a dataset matrix
@@ -26,7 +28,7 @@ def create_dataset(dataset, look_back=1):
 # plt.plot(dataset)
 # plt.show()
 
-dataframe = read_csv('./file/user_balance_table_all.csv', usecols=[4], engine='python', skipfooter=3)
+dataframe = read_csv('../file/grouped.csv', usecols=[5], engine='python', skipfooter=3)
 dataset = dataframe.values
 print(dataset)
 dataset = dataset.astype('float64')
@@ -63,21 +65,34 @@ model = keras.Sequential()
 model.add(LSTM(4, input_shape=(1, look_back)))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
-model.fit(trainX, trainY, epochs=100, batch_size=1, verbose=2)
+print(model.summary())
+myfile = os.path.exists("lstm.model")
+if myfile:
+    print("ssss")
+else:
+    model_prob = model.fit(trainX, trainY, epochs=100, batch_size=1, verbose=2)
+    trainPredict = model.predict(trainX)
+    testPredict = model.predict(testX)
+    trainPredict = scaler.inverse_transform(trainPredict)
+    trainY = scaler.inverse_transform([trainY])
+    testPredict = scaler.inverse_transform(testPredict)
+    testY = scaler.inverse_transform([testY])
 
+#     joblib.dump(model_prob, "lstm.model")
+# clf = joblib.load("lstm.model")
 # make predictions
-trainPredict = model.predict(trainX)
-testPredict = model.predict(testX)
+# trainPredict = clf.predict(trainX)
+# testPredict = clf.predict(testX)
 
 # invert predictions
-trainPredict = scaler.inverse_transform(trainPredict)
-trainY = scaler.inverse_transform([trainY])
-testPredict = scaler.inverse_transform(testPredict)
-testY = scaler.inverse_transform([testY])
+# trainPredict = scaler.inverse_transform(trainPredict)
+# trainY = scaler.inverse_transform([trainY])
+# testPredict = scaler.inverse_transform(testPredict)
+# testY = scaler.inverse_transform([testY])
 
-trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
+trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0])/trainY)
 print('Train Score: %.2f RMSE' % (trainScore))
-testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
+testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0])/len(testY))
 print('Test Score: %.2f RMSE' % (testScore))
 
 # shift train predictions for plotting
