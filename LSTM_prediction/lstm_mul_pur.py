@@ -49,7 +49,8 @@ numpy.random.seed(7)
 # normalize the dataset
 scaler = MinMaxScaler(feature_range=(0, 1))
 dataset = scaler.fit_transform(dataset)
-dataset_mulfeature = scaler.fit_transform(dataset_mulfeature)
+scaler2 = MinMaxScaler(feature_range=(0, 1))
+dataset_mulfeature = scaler2.fit_transform(dataset_mulfeature)
 
 
 # split into train and test sets
@@ -73,7 +74,7 @@ print("testY",testY.shape)
 
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(4, input_shape=(1, 12)))
+model.add(LSTM(10, input_shape=(1, 12)))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 print(model.summary())
@@ -81,7 +82,7 @@ myfile = os.path.exists("lstm.model")
 if myfile:
     print("ssss")
 else:
-    model_prob = model.fit(trainX, trainY, epochs=5, batch_size=1, verbose=2)
+    model_prob = model.fit(trainX, trainY, epochs=105, batch_size=1, verbose=2)
     trainPredict = model.predict(trainX)
     testPredict = model.predict(testX)
     trainPredict = scaler.inverse_transform(trainPredict)
