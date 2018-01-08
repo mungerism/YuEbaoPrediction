@@ -1,5 +1,5 @@
 '''
-申购的lstm取得较为不错的效果
+赎回的lstm
 '''
 import numpy
 import matplotlib.pyplot as plt
@@ -16,14 +16,13 @@ import pandas as pd
 from sklearn.externals import joblib
 import os
 
-# Xsss is the number of passengers at a given time (t) and Y is the number of passengers at the next time (t + 1).
+# X is the number of passengers at a given time (t) and Y is the number of passengers at the next time (t + 1).
 # convert an array of values into a dataset matrix
-def create_dataset(data_x,dataset, look_back=1):
+def create_dataset(dataset_X,dataset_Y, look_back=1):
     dataX, dataY = [], []
-    for i in range(len(dataset)-look_back-1):
-        a = data_x[i:(i+look_back), 0]
-        dataX.append(a)
-        dataY.append(dataset[i + look_back, 0])
+    dataX = dataset_X[0:len(dataset_Y)-look_back-1]
+    for i in range(len(dataset_Y)-look_back-1):
+        dataY.append(dataset_Y[i + look_back, 0])
     return numpy.array(dataX), numpy.array(dataY)
 
 # # load the dataset
@@ -33,55 +32,74 @@ def create_dataset(data_x,dataset, look_back=1):
 # plt.plot(dataset)
 # plt.show()
 
-dataframe_amt = read_csv('../file/grouped.csv', usecols=[4], engine='python', skipfooter=3)
-dataset = dataframe_amt.values
-print(dataset)
+dataframe = read_csv('../file/grouped.csv', usecols=[4], engine='python', skipfooter=3)
+dataset = dataframe.values
 dataset = dataset.astype('float64')
 plt.plot(dataset)
 plt.show()
-print(dataset)
-dataframe = read_csv('../file/grouped.csv', usecols=[1,2,3,4,5,6,7,8,9,10,11,12],  engine='python', skipfooter=3)
-dataframe_value = dataframe.values
-dataframe_type = dataframe_value.astype("float64")
+
+dataframe_mulfeature = read_csv('../file/grouped.csv', usecols=[1,2,3,4,5,6,7,8,9,10,11,12], engine='python', skipfooter=3)
+dataset_mulfeature = dataframe_mulfeature.values
+dataset_mulfeature = dataset_mulfeature.astype('float64')
+
+
 # fix random seed for reproducibility
 numpy.random.seed(7)
 
 # normalize the dataset
 scaler = MinMaxScaler(feature_range=(0, 1))
 dataset = scaler.fit_transform(dataset)
-dataset_second = scaler.fit_transform(dataframe_type)
+dataset_mulfeature = scaler.fit_transform(dataset_mulfeature)
+
 
 # split into train and test sets
-train_size = int(len(dataset_second) * 0.67)
-test_size = len(dataset_second) - train_size
-train_Y, test_Y = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
-#includes 12 features
-train_X, test_X = dataset_second[0:train_size,:], dataset_second[train_size:len(dataset),:]
-
+train_size = int(len(dataset) * 0.67)
+test_size = len(dataset) - train_size
+train_x, test_x = dataset_mulfeature[0:train_size,:], dataset_mulfeature[train_size:len(dataset),:]
+train_y,test_y = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
 # use this function to prepare the train and test datasets for modeling
 look_back = 1
-trainX, trainY = create_dataset(train_X,train_Y, look_back)
-testX, testY = create_dataset(test_X,test_Y, look_back)
+trainX, trainY = create_dataset(train_x,train_y, look_back)
+testX, testY = create_dataset(test_x,test_y, look_back)
 
 # reshape input to be [samples, time steps, features]
 trainX = numpy.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1]))
 testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
 
+print("trainX",trainX.shape)
+print("trainY",trainY.shape)
+print("testX",testX.shape)
+print("testY",testY.shape)
+
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(4, input_shape=(1, look_back)))
+model.add(LSTM(4, input_shape=(1, 12)))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 print(model.summary())
+myfile = os.path.exists("lstm.model")
+if myfile:
+    print("ssss")
+else:
+    model_prob = model.fit(trainX, trainY, epochs=5, batch_size=1, verbose=2)
+    trainPredict = model.predict(trainX)
+    testPredict = model.predict(testX)
+    trainPredict = scaler.inverse_transform(trainPredict)
+    trainY = scaler.inverse_transform([trainY])
+    testPredict = scaler.inverse_transform(testPredict)
+    testY = scaler.inverse_transform([testY])
 
-model_prob = model.fit(trainX, trainY, epochs=10, batch_size=1, verbose=2)
-trainPredict = model.predict(trainX)
-testPredict = model.predict(testX)
-trainPredict = scaler.inverse_transform(trainPredict)
-trainY = scaler.inverse_transform([trainY])
-testPredict = scaler.inverse_transform(testPredict)
-testY = scaler.inverse_transform([testY])
+#     joblib.dump(model_prob, "lstm.model")
+# clf = joblib.load("lstm.model")
+# make predictions
+# trainPredict = clf.predict(trainX)
+# testPredict = clf.predict(testX)
 
+# invert predictions
+# trainPredict = scaler.inverse_transform(trainPredict)
+# trainY = scaler.inverse_transform([trainY])
+# testPredict = scaler.inverse_transform(testPredict)
+# testY = scaler.inverse_transform([testY])
 
 trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
 print('Train Score: %.2f RMSE' % (trainScore))
@@ -103,5 +121,4 @@ plt.plot(scaler.inverse_transform(dataset))
 plt.plot(trainPredictPlot)
 plt.plot(testPredictPlot)
 plt.show()
-print("hh")
 
