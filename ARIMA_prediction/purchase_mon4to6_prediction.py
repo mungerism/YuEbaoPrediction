@@ -46,7 +46,7 @@ def predict_diff_recover(predict_value, d):
         tmp_data.dropna(inplace=True)
     return tmp_data
 
-def test_stationarity(timeseries):
+def stationarity_test(timeseries):
     # Determing rolling statistics
     rolmean = pd.rolling_mean(timeseries, window=30)
     rolstd = pd.rolling_std(timeseries, window=30)
@@ -119,7 +119,7 @@ ts_diff_1.plot()
 plt.title('First Difference')
 plt.show()
 
-# proper_model(ts_diff_1, 10)
+proper_model(ts_diff_1, 10)
 
 plt.figure()
 plt.axhline(y=-1.96/np.sqrt(len(ts_diff_1)),linestyle='--',color='gray')
@@ -158,6 +158,3 @@ ts.fillna(0)
 rol_recover.fillna(0)
 rmse = sqrt(mean_squared_error(ts, rol_recover))
 print('rmse', rmse)
-
-if __name__ == '__main__':
-    pass
