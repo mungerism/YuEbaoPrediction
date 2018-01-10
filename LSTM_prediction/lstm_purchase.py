@@ -16,7 +16,7 @@ import pandas as pd
 from sklearn.externals import joblib
 import os
 
-# Xsss is the number of passengers at a given time (t) and Y is the number of passengers at the next time (t + 1).
+# X is the number of passengers at a given time (t) and Y is the number of passengers at the next time (t + 1).
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, look_back=1):
     dataX, dataY = [], []
@@ -26,12 +26,13 @@ def create_dataset(dataset, look_back=1):
         dataY.append(dataset[i + look_back, 0])
     return numpy.array(dataX), numpy.array(dataY)
 
-# # load the dataset
-# dataframe = read_csv('./file/international-airline-passengers.csv', usecols=[1], engine='python', skipfooter=3)
-# dataset = dataframe.values
-# dataset = dataset.astype('float32')
-# plt.plot(dataset)
-# plt.show()
+def err(true,predicted):
+    err = 0
+    for i in range(len(true)):
+        tmp = (true[i]-predicted[i])/true[i]
+        err += tmp*tmp
+    standard_err = math.sqrt(err/len(true))
+    return standard_err
 
 dataframe = read_csv('../file/grouped.csv', usecols=[4], engine='python', skipfooter=3)
 dataset = dataframe.values
@@ -67,7 +68,7 @@ testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
 
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(4, input_shape=(1, look_back)))
+model.add(LSTM(6, input_shape=(1, look_back)))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 print(model.summary())
@@ -75,29 +76,18 @@ myfile = os.path.exists("lstm.model")
 if myfile:
     print("ssss")
 else:
-    model_prob = model.fit(trainX, trainY, epochs=1000, batch_size=1, verbose=2)
+    model_prob = model.fit(trainX, trainY, epochs=115, batch_size=1, verbose=2)
     trainPredict = model.predict(trainX)
     testPredict = model.predict(testX)
     trainPredict = scaler.inverse_transform(trainPredict)
     trainY = scaler.inverse_transform([trainY])
     testPredict = scaler.inverse_transform(testPredict)
     testY = scaler.inverse_transform([testY])
-
-    # joblib.dump(model, "lstm.model")
-# clf = joblib.load("lstm.model")
-# make predictions
-# trainPredict = clf.predict(trainX)
-# testPredict = clf.predict(testX)
-
-# invert predictions
-# trainPredict = scaler.inverse_transform(trainPredict)
-# trainY = scaler.inverse_transform([trainY])
-# testPredict = scaler.inverse_transform(testPredict)
-# testY = scaler.inverse_transform([testY])
-
-trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
+trainY1 = trainY[0]
+predictedY1 = trainPredict[:,0]
+trainScore = math.sqrt(err(trainY1, predictedY1))
 print('Train Score: %.2f RMSE' % (trainScore))
-testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
+testScore = math.sqrt(err(testY[0], testPredict[:,0]))
 print('Test Score: %.2f RMSE' % (testScore))
 
 # shift train predictions for plotting
@@ -115,5 +105,4 @@ plt.plot(scaler.inverse_transform(dataset))
 plt.plot(trainPredictPlot)
 plt.plot(testPredictPlot)
 plt.show()
-print("hh")
 
