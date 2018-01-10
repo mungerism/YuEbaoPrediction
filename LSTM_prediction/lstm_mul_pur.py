@@ -52,7 +52,6 @@ dataset = scaler.fit_transform(dataset)
 scaler2 = MinMaxScaler(feature_range=(0, 1))
 dataset_mulfeature = scaler2.fit_transform(dataset_mulfeature)
 
-
 # split into train and test sets
 train_size = int(len(dataset) * 0.67)
 test_size = len(dataset) - train_size
