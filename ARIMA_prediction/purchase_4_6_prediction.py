@@ -6,6 +6,8 @@ import numpy as np
 import sys
 from statsmodels.tsa.arima_model import ARMA
 import statsmodels.api as sm
+from sklearn.metrics import mean_squared_error
+from math import sqrt
 
 
 # 差分操作,d代表差分序列，比如[1,1,1]可以代表3阶差分。  [12,1]可以代表第一次差分偏移量是12，第二次差分偏移量是1
@@ -151,20 +153,11 @@ rol_recover.plot(label='predicted')
 ts.plot(label='original')
 plt.legend(loc='best')
 plt.show()
-from sklearn.metrics import mean_squared_error
-from math import sqrt
+
 ts.fillna(0)
 rol_recover.fillna(0)
 rmse = sqrt(mean_squared_error(ts, rol_recover))
 print('rmse', rmse)
 
-
-# ts = ts['2014-05-01':'2014-05-31']
-# rol_recover = rol_recover['2014-05-01':'2014-05-31']
-# print(ts)
-# print(rol_recover)
-
-
-
-
-
+if __name__ == '__main__':
+    pass
