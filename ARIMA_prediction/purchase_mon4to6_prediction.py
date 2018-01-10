@@ -154,7 +154,21 @@ ts.plot(label='original')
 plt.legend(loc='best')
 plt.show()
 
-ts.fillna(0)
-rol_recover.fillna(0)
-rmse = sqrt(mean_squared_error(ts, rol_recover))
-print('rmse', rmse)
+# ts.fillna(0)
+# rol_recover.fillna(0)
+# rmse = sqrt(mean_squared_error(ts, rol_recover))
+# print('rmse', rmse)
+
+import math
+from sklearn.preprocessing import MinMaxScaler
+
+def err(true,predicted):
+    err = 0
+    for i in range(len(true)):
+        tmp = (true[i]-predicted[i])/true[i]
+        err += tmp*tmp
+    standard_err = math.sqrt(err/len(true))
+    return standard_err
+
+m = err(ts, rol_recover)
+print('RMSE', m)
