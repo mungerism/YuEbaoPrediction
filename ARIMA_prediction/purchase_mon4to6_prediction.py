@@ -4,6 +4,8 @@ from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 import numpy as np
 import sys
+import math
+
 from statsmodels.tsa.arima_model import ARMA
 import statsmodels.api as sm
 from sklearn.metrics import mean_squared_error
@@ -89,6 +91,14 @@ def proper_model(ts_log_diff, maxLag):
                 best_model = results_ARMA
     print(best_p,best_q,best_model)
 
+def err(true,predicted):
+    err = 0
+    for i in range(len(true)):
+        tmp = (true[i]-predicted[i])/true[i]
+        err += tmp*tmp
+    standard_err = math.sqrt(err/len(true))
+    return standard_err
+
 df = pd.read_csv('../file/user_balance_table_all.csv', index_col='user_id', names=['user_id', 'report_date', 'tBalance', 'yBalance', 'total_purchase_amt', 'direct_purchase_amt', 'purchase_bal_amt', 'purchase_bank_amt', 'total_redeem_amt', 'consume_amt', 'transfer_amt', 'tftobal_amt', 'tftocard_amt', 'share_amt', 'category1', 'category2', 'category3', 'category4'
 ], parse_dates=[1])
 
@@ -119,7 +129,7 @@ ts_diff_1.plot()
 plt.title('First Difference')
 plt.show()
 
-proper_model(ts_diff_1, 10)
+# proper_model(ts_diff_1, 10)
 
 plt.figure()
 plt.axhline(y=-1.96/np.sqrt(len(ts_diff_1)),linestyle='--',color='gray')
@@ -154,21 +164,6 @@ ts.plot(label='original')
 plt.legend(loc='best')
 plt.show()
 
-# ts.fillna(0)
-# rol_recover.fillna(0)
-# rmse = sqrt(mean_squared_error(ts, rol_recover))
-# print('rmse', rmse)
+m = err(ts.values[8:], rol_recover.values[8:])
 
-import math
-from sklearn.preprocessing import MinMaxScaler
-
-def err(true,predicted):
-    err = 0
-    for i in range(len(true)):
-        tmp = (true[i]-predicted[i])/true[i]
-        err += tmp*tmp
-    standard_err = math.sqrt(err/len(true))
-    return standard_err
-
-m = err(ts, rol_recover)
 print('RMSE', m)
