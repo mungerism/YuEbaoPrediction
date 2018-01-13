@@ -18,7 +18,7 @@ import os
 
 # X is the number of passengers at a given time (t) and Y is the number of passengers at the next time (t + 1).
 # convert an array of values into a dataset matrix
-def create_dataset(dataset_X,dataset_Y, look_back=1):
+def create_dataset(dataset_X, dataset_Y, look_back=1):
     dataX, dataY = [], []
     dataX = dataset_X[0:len(dataset_Y)-look_back-1]
     for i in range(len(dataset_Y)-look_back-1):
