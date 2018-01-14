@@ -6,7 +6,13 @@ import numpy as np
 import sys
 from statsmodels.tsa.arima_model import ARMA
 
-
+def err(true,predicted):
+    err = 0
+    for i in range(len(true)):
+        tmp = (true[i]-predicted[i])/true[i]
+        err += tmp*tmp
+    standard_err = np.sqrt(err/len(true))
+    return standard_err
 # 差分操作,d代表差分序列，比如[1,1,1]可以代表3阶差分。  [12,1]可以代表第一次差分偏移量是12，第二次差分偏移量是1
 def diff_ts(ts, d):
     global shift_ts_list
@@ -86,121 +92,121 @@ def proper_model(ts_log_diff, maxLag):
                 best_model = results_ARMA
     print(best_p,best_q,best_model)
 
-# df = pd.read_csv('../file/user_balance_table_all.csv', index_col='user_id', names=['user_id', 'report_date', 'tBalance', 'yBalance', 'total_purchase_amt', 'direct_purchase_amt', 'purchase_bal_amt', 'purchase_bank_amt', 'total_redeem_amt', 'consume_amt', 'transfer_amt', 'tftobal_amt', 'tftocard_amt', 'share_amt', 'category1', 'category2', 'category3', 'category4'
-# ], parse_dates=[1])
-#
-# df['report_date'] = pd.to_datetime(df['report_date'], errors='coerce')
-#
-# labels = ['tBalance', 'yBalance', 'total_purchase_amt', 'direct_purchase_amt', 'purchase_bal_amt', 'purchase_bank_amt', 'total_redeem_amt', 'consume_amt', 'transfer_amt', 'tftobal_amt', 'tftocard_amt', 'share_amt']
-# for label in labels:
-#     print(label)
-#     df[label] = pd.to_numeric(df[label], errors='coerce')
-#
-# df = df.groupby('report_date').sum()
-# ts = df['total_redeem_amt']
-# # ts = ts['2014-04-01':'2014-06-30']
-#
-# # print('原数据ADF')
-# # test_stationarity(ts)
-#
-# ts.plot()
-# plt.title('Total Redeem')
-# plt.show()
-#
-# #一阶差分
-# diff_1 = diff_ts(ts, [1])
-# diff_1.plot()
-# # plt.title('Total purchase first difference')
-# plt.title('Total redeem first difference')
-#
-# plt.show()
-#
-#
-# plt.figure()
-# plt.axhline(y=-1.96/np.sqrt(len(ts)),linestyle='--',color='gray')
-# plt.axhline(y=1.96/np.sqrt(len(ts)),linestyle='--',color='gray')
-# plot_acf(ts, ax=plt.gca(), lags=60)
-# plt.show()
-#
-# plt.axhline(y=-1.96/np.sqrt(len(ts)),linestyle='--',color='gray')
-# plt.axhline(y=1.96/np.sqrt(len(ts)),linestyle='--',color='gray')
-# plot_pacf(ts, ax=plt.gca(), lags=60)
-# plt.show()
-#
-# diff_1 = diff_ts(ts, [1])
-#
-# print('一阶差分数据ADF')
-# test_stationarity(diff_1)
-#
-# plt.figure()
-# plt.axhline(y=-1.96/np.sqrt(len(diff_1)),linestyle='--',color='gray')
-# plt.axhline(y=1.96/np.sqrt(len(diff_1)),linestyle='--',color='gray')
-# plot_acf(diff_1, ax=plt.gca(), lags=60)
-# plt.show()
-#
-# plt.axhline(y=-1.96/np.sqrt(len(diff_1)),linestyle='--',color='gray')
-# plt.axhline(y=1.96/np.sqrt(len(diff_1)),linestyle='--',color='gray')
-# plot_pacf(diff_1, ax=plt.gca(), lags=60)
-# plt.show()
-#
-# rol_mean = ts.rolling(window=7).mean()
-# rol_mean.dropna(inplace=True)
-#
-# rol_mean.plot()
-# plt.title('Rolling Mean')
-# plt.show()
-#
-# ts_diff_1 = diff_ts(rol_mean, [1])
-#
-# ts_diff_1.plot()
-# plt.title('First Difference')
-# plt.show()
-#
-# print('移动平均并差分后ADF')
-# test_stationarity(ts_diff_1)
-#
-# plt.figure()
-# plt.axhline(y=-1.96/np.sqrt(len(ts_diff_1)),linestyle='--',color='gray')
-# plt.axhline(y=1.96/np.sqrt(len(ts_diff_1)),linestyle='--',color='gray')
-# plot_acf(ts_diff_1, ax=plt.gca(), lags=60)
-# plt.show()
-#
-# plt.axhline(y=-1.96/np.sqrt(len(ts_diff_1)),linestyle='--',color='gray')
-# plt.axhline(y=1.96/np.sqrt(len(ts_diff_1)),linestyle='--',color='gray')
-# plot_pacf(ts_diff_1, ax=plt.gca(), lags=60)
-# plt.show()
-#
-# # proper_model(ts_diff_1, 10)
-#
-# model = ARMA(ts_diff_1, order=(1, 8))
-# result_arma = model.fit(disp=-1, method='css')
-#
-# predict_ts = result_arma.predict()
-#
-# predict_ts.plot(label='predicted')
-# ts_diff_1.plot(label='original')
-# plt.legend(loc='best')
-# plt.show()
-#
-# recovery_diff_1 = predict_diff_recover(predict_ts, [1])
-# recovery_diff_1.plot()
-# plt.show()
-#
-# rol_sum = ts.rolling(window=6).sum()
-# rol_recover = recovery_diff_1*7 - rol_sum.shift(1)
-#
-# rol_recover.plot(label='predicted')
-# ts.plot(label='original')
-#
-# plt.legend(loc='best')
-# plt.show()
-#
-# total_redeem_residual = ts - rol_recover
-# total_redeem_residual_values = total_redeem_residual.values[8:]
-# df = df[8:]
-# df['total_redeem_amt'] = total_redeem_residual_values
-# df.to_csv('../file/hybrid_total_redeem.csv')
-# # print(total_redeem_residual_values)
+df = pd.read_csv('../file/user_balance_table_all.csv', index_col='user_id', names=['user_id', 'report_date', 'tBalance', 'yBalance', 'total_purchase_amt', 'direct_purchase_amt', 'purchase_bal_amt', 'purchase_bank_amt', 'total_redeem_amt', 'consume_amt', 'transfer_amt', 'tftobal_amt', 'tftocard_amt', 'share_amt', 'category1', 'category2', 'category3', 'category4'
+], parse_dates=[1])
+
+df['report_date'] = pd.to_datetime(df['report_date'], errors='coerce')
+
+labels = ['tBalance', 'yBalance', 'total_purchase_amt', 'direct_purchase_amt', 'purchase_bal_amt', 'purchase_bank_amt', 'total_redeem_amt', 'consume_amt', 'transfer_amt', 'tftobal_amt', 'tftocard_amt', 'share_amt']
+for label in labels:
+    print(label)
+    df[label] = pd.to_numeric(df[label], errors='coerce')
+
+df = df.groupby('report_date').sum()
+total_redeem_original = df['total_redeem_amt']
+# ts = ts['2014-04-01':'2014-06-30']
+
+# print('原数据ADF')
+# test_stationarity(ts)
+
+total_redeem_original.plot()
+plt.title('Total Redeem')
+plt.show()
+
+#一阶差分
+diff_1 = diff_ts(total_redeem_original, [1])
+diff_1.plot()
+# plt.title('Total purchase first difference')
+plt.title('Total redeem first difference')
+
+plt.show()
+
+
+plt.figure()
+plt.axhline(y=-1.96/np.sqrt(len(total_redeem_original)), linestyle='--', color='gray')
+plt.axhline(y=1.96/np.sqrt(len(total_redeem_original)), linestyle='--', color='gray')
+plot_acf(total_redeem_original, ax=plt.gca(), lags=60)
+plt.show()
+
+plt.axhline(y=-1.96/np.sqrt(len(total_redeem_original)), linestyle='--', color='gray')
+plt.axhline(y=1.96/np.sqrt(len(total_redeem_original)), linestyle='--', color='gray')
+plot_pacf(total_redeem_original, ax=plt.gca(), lags=60)
+plt.show()
+
+diff_1 = diff_ts(total_redeem_original, [1])
+
+print('一阶差分数据ADF')
+test_stationarity(diff_1)
+
+plt.figure()
+plt.axhline(y=-1.96/np.sqrt(len(diff_1)),linestyle='--',color='gray')
+plt.axhline(y=1.96/np.sqrt(len(diff_1)),linestyle='--',color='gray')
+plot_acf(diff_1, ax=plt.gca(), lags=60)
+plt.show()
+
+plt.axhline(y=-1.96/np.sqrt(len(diff_1)),linestyle='--',color='gray')
+plt.axhline(y=1.96/np.sqrt(len(diff_1)),linestyle='--',color='gray')
+plot_pacf(diff_1, ax=plt.gca(), lags=60)
+plt.show()
+
+rol_mean = total_redeem_original.rolling(window=7).mean()
+rol_mean.dropna(inplace=True)
+
+rol_mean.plot()
+plt.title('Rolling Mean')
+plt.show()
+
+ts_diff_1 = diff_ts(rol_mean, [1])
+
+ts_diff_1.plot()
+plt.title('First Difference')
+plt.show()
+
+print('移动平均并差分后ADF')
+test_stationarity(ts_diff_1)
+
+plt.figure()
+plt.axhline(y=-1.96/np.sqrt(len(ts_diff_1)),linestyle='--',color='gray')
+plt.axhline(y=1.96/np.sqrt(len(ts_diff_1)),linestyle='--',color='gray')
+plot_acf(ts_diff_1, ax=plt.gca(), lags=60)
+plt.show()
+
+plt.axhline(y=-1.96/np.sqrt(len(ts_diff_1)),linestyle='--',color='gray')
+plt.axhline(y=1.96/np.sqrt(len(ts_diff_1)),linestyle='--',color='gray')
+plot_pacf(ts_diff_1, ax=plt.gca(), lags=60)
+plt.show()
+
+# proper_model(ts_diff_1, 10)
+
+model = ARMA(ts_diff_1, order=(1, 8))
+result_arma = model.fit(disp=-1, method='css')
+
+predict_ts = result_arma.predict()
+
+predict_ts.plot(label='predicted')
+ts_diff_1.plot(label='original')
+plt.legend(loc='best')
+plt.show()
+
+recovery_diff_1 = predict_diff_recover(predict_ts, [1])
+recovery_diff_1.plot()
+plt.show()
+
+rol_sum = total_redeem_original.rolling(window=6).sum()
+total_redeem_prediction = recovery_diff_1 * 7 - rol_sum.shift(1)
+
+total_redeem_prediction.plot(label='predicted')
+total_redeem_original.plot(label='original')
+
+plt.legend(loc='best')
+plt.show()
+
+total_redeem_residual = total_redeem_original - total_redeem_prediction
+total_redeem_residual_values = total_redeem_residual.values[8:]
+df = df[8:]
+df['total_redeem_amt'] = total_redeem_residual_values
+df.to_csv('../file/hybrid_total_redeem.csv')
+# print(total_redeem_residual_values)
 
 
 
@@ -239,29 +245,29 @@ def create_dataset(dataset_X, dataset_Y, look_back=1):
 # plt.show()
 
 df = pd.read_csv('../file/hybrid_total_redeem.csv', index_col='report_date')
-print(df)
 labels = ['tBalance', 'yBalance', 'total_purchase_amt', 'direct_purchase_amt', 'purchase_bal_amt', 'purchase_bank_amt', 'total_redeem_amt', 'consume_amt', 'transfer_amt', 'tftobal_amt', 'tftocard_amt', 'share_amt']
 for label in labels:
-    print(label)
     df[label] = pd.to_numeric(df[label], errors='coerce')
 
 dataframe = df['total_redeem_amt']
 dataset = dataframe.values
 dataset = dataset.astype('float64')
-print(dataset)
 plt.plot(dataset)
 plt.show()
 
 dataframe_mulfeature = df[1:]
 dataset_mulfeature = dataframe_mulfeature.values
 dataset_mulfeature = dataset_mulfeature.astype('float64')
-print(dataset_mulfeature)
 
 # fix random seed for reproducibility
 numpy.random.seed(7)
 
 # normalize the dataset
 scaler = MinMaxScaler(feature_range=(0, 1))
+
+dataset = dataset.reshape(-1,1)
+print(dataset)
+
 dataset = scaler.fit_transform(dataset)
 scaler2 = MinMaxScaler(feature_range=(0, 1))
 dataset_mulfeature = scaler2.fit_transform(dataset_mulfeature)
@@ -303,18 +309,6 @@ else:
     testPredict = scaler.inverse_transform(testPredict)
     testY = scaler.inverse_transform([testY])
 
-#     joblib.dump(model_prob, "lstm.model")
-# clf = joblib.load("lstm.model")
-# make predictions
-# trainPredict = clf.predict(trainX)
-# testPredict = clf.predict(testX)
-
-# invert predictions
-# trainPredict = scaler.inverse_transform(trainPredict)
-# trainY = scaler.inverse_transform([trainY])
-# testPredict = scaler.inverse_transform(testPredict)
-# testY = scaler.inverse_transform([testY])
-
 trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
 print('Train Score: %.2f RMSE' % (trainScore))
 testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
@@ -336,9 +330,40 @@ plt.plot(trainPredictPlot)
 plt.plot(testPredictPlot)
 plt.show()
 
+print('testPredict', testPredict, 'len', len(testPredict))
 
 
+df = pd.read_csv('../file/user_balance_table_all.csv', index_col='user_id', names=['user_id', 'report_date', 'tBalance', 'yBalance', 'total_purchase_amt', 'direct_purchase_amt', 'purchase_bal_amt', 'purchase_bank_amt', 'total_redeem_amt', 'consume_amt', 'transfer_amt', 'tftobal_amt', 'tftocard_amt', 'share_amt', 'category1', 'category2', 'category3', 'category4'
+], parse_dates=[1])
 
+df['report_date'] = pd.to_datetime(df['report_date'], errors='coerce')
 
+labels = ['tBalance', 'yBalance', 'total_purchase_amt', 'direct_purchase_amt', 'purchase_bal_amt', 'purchase_bank_amt', 'total_redeem_amt', 'consume_amt', 'transfer_amt', 'tftobal_amt', 'tftocard_amt', 'share_amt']
+for label in labels:
+    print(label)
+    df[label] = pd.to_numeric(df[label], errors='coerce')
+
+df = df.groupby('report_date').sum()
+total_redeem_original = df['total_redeem_amt']
+
+len_testPrediction = len(testPredict)
+testPredict = testPredict.T
+arima_redeem_prediction = total_redeem_prediction[-len_testPrediction:]
+hybrid_redeem_prediction_val = arima_redeem_prediction.values + testPredict
+
+sub_redeem_original = total_redeem_original[-len_testPrediction:]
+
+arima_redeem_prediction.plot(label='predicted')
+sub_redeem_original.plot(label='original')
+plt.legend(loc='best')
+plt.title('ARIMA')
+plt.show()
+
+arima_rmse = err(arima_redeem_prediction.values, sub_redeem_original.values)
+print('ARIMA RMSE', arima_rmse)
+
+hybrid_rmse = err(hybrid_redeem_prediction_val, sub_redeem_original.values)
+
+print('Hybrid RMSE', hybrid_rmse)
 
 
