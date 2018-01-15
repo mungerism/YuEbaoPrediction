@@ -100,6 +100,6 @@ ENV/
 # mypy
 .mypy_cache/
 file/user_balance_table_all.csv
-/.idea/
 /.idea
-.idea
+.idea/
+/.idea/vcs.xml
