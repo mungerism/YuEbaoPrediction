@@ -1,5 +1,7 @@
 '''
 赎回的lstm
+http://blog.csdn.net/youyuyixiu/article/details/72841703
+http://blog.csdn.net/youyuyixiu/article/details/72840893
 '''
 import numpy
 import matplotlib.pyplot as plt
@@ -10,6 +12,7 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
+from sklearn.ensemble import RandomForestRegressor
 from keras.models import Sequential
 
 import pandas as pd
@@ -40,13 +43,13 @@ def create_dataset(dataset_X, dataset_Y, look_back=1):
 # plt.plot(dataset)
 # plt.show()
 
-dataframe = read_csv('../file/hybrid_total_redeem.csv', usecols=[7], engine='python', skipfooter=3)
+dataframe = read_csv('../../file/hybrid_total_redeem.csv', usecols=[7], engine='python', skipfooter=3)
 dataset = dataframe.values
 dataset = dataset.astype('float64')
 plt.plot(dataset)
 plt.show()
 
-dataframe_mulfeature = read_csv('../file/hybrid_total_redeem.csv', usecols=[1,2,3,4,5,6,7,8,9,10,11,12], engine='python', skipfooter=3)
+dataframe_mulfeature = read_csv('../../file/hybrid_total_redeem.csv', usecols=[1,2,3,4,5,6,7,8,9,10,11,12], engine='python', skipfooter=3)
 dataset_mulfeature = dataframe_mulfeature.values
 dataset_mulfeature = dataset_mulfeature.astype('float64')
 
@@ -79,24 +82,14 @@ print("trainY",trainY.shape)
 print("testX",testX.shape)
 print("testY",testY.shape)
 
+clf = RandomForestRegressor(n_estimators=200,max_features = .12).fit(trainX,trainY)
 # create and fit the LSTM network
-model = Sequential()
-model.add(LSTM(12, input_shape=(1, 12)))
-model.add(Dense(1))
-model.add(Dense(1))
-model.compile(loss='mean_squared_error', optimizer='adam')
-print(model.summary())
-myfile = os.path.exists("lstm.model")
-if myfile:
-    print("ssss")
-else:
-    model_prob = model.fit(trainX, trainY, epochs=105, batch_size=1, verbose=2)
-    trainPredict = model.predict(trainX)
-    testPredict = model.predict(testX)
-    trainPredict = scaler.inverse_transform(trainPredict)
-    trainY = scaler.inverse_transform([trainY])
-    testPredict = scaler.inverse_transform(testPredict)
-    testY = scaler.inverse_transform([testY])
+trainPredict = clf.predict(trainX)
+testPredict = clf.predict(testX)
+trainPredict = scaler.inverse_transform(trainPredict)
+trainY = scaler.inverse_transform([trainY])
+testPredict = scaler.inverse_transform(testPredict)
+testY = scaler.inverse_transform([testY])
 
 #     joblib.dump(model_prob, "lstm.model")
 # clf = joblib.load("lstm.model")
