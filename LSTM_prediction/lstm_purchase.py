@@ -68,7 +68,8 @@ testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
 
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(6, input_shape=(1, look_back)))
+model.add(LSTM(10, input_shape=(1, look_back)))
+model.add((Dense(1)))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 print(model.summary())
