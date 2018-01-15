@@ -25,3 +25,8 @@ b = [2,2,3,12]
 
 m = err(b,a)
 print(m)
+
+
+total_redeem_residual = total_redeem_original - total_redeem_prediction
+
+total_redeem_original
