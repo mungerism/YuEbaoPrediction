@@ -1,8 +1,7 @@
 import matplotlib.pylab as plt
 import pandas as pd
 
-df = pd.read_csv('./file/mfd_bank_shibor.csv',
-                 parse_dates=[0])
+df = pd.read_csv('./file/mfd_bank_shibor.csv',  parse_dates=[0])
 
 print(df)
 df['mfd_date'] = pd.to_datetime(df['mfd_date'], errors='coerce')

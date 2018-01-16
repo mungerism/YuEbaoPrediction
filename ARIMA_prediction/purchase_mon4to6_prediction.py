@@ -4,7 +4,13 @@ from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 import numpy as np
 import sys
+import math
+
 from statsmodels.tsa.arima_model import ARMA
+import statsmodels.api as sm
+from sklearn.metrics import mean_squared_error
+from math import sqrt
+
 
 # 差分操作,d代表差分序列，比如[1,1,1]可以代表3阶差分。  [12,1]可以代表第一次差分偏移量是12，第二次差分偏移量是1
 def diff_ts(ts, d):
@@ -42,7 +48,7 @@ def predict_diff_recover(predict_value, d):
         tmp_data.dropna(inplace=True)
     return tmp_data
 
-def test_stationarity(timeseries):
+def stationarity_test(timeseries):
     # Determing rolling statistics
     rolmean = pd.rolling_mean(timeseries, window=30)
     rolstd = pd.rolling_std(timeseries, window=30)
@@ -85,7 +91,15 @@ def proper_model(ts_log_diff, maxLag):
                 best_model = results_ARMA
     print(best_p,best_q,best_model)
 
-df = pd.read_csv('./file/user_balance_table_all.csv', index_col='user_id', names=['user_id', 'report_date', 'tBalance', 'yBalance', 'total_purchase_amt', 'direct_purchase_amt', 'purchase_bal_amt', 'purchase_bank_amt', 'total_redeem_amt', 'consume_amt', 'transfer_amt', 'tftobal_amt', 'tftocard_amt', 'share_amt', 'category1', 'category2', 'category3', 'category4'
+def err(true,predicted):
+    err = 0
+    for i in range(len(true)):
+        tmp = (true[i]-predicted[i])/true[i]
+        err += tmp*tmp
+    standard_err = math.sqrt(err/len(true))
+    return standard_err
+
+df = pd.read_csv('../file/user_balance_table_all.csv', index_col='user_id', names=['user_id', 'report_date', 'tBalance', 'yBalance', 'total_purchase_amt', 'direct_purchase_amt', 'purchase_bal_amt', 'purchase_bank_amt', 'total_redeem_amt', 'consume_amt', 'transfer_amt', 'tftobal_amt', 'tftocard_amt', 'share_amt', 'category1', 'category2', 'category3', 'category4'
 ], parse_dates=[1])
 
 df['report_date'] = pd.to_datetime(df['report_date'], errors='coerce')
@@ -150,11 +164,6 @@ ts.plot(label='original')
 plt.legend(loc='best')
 plt.show()
 
-ts = ts['2014-05-01':'2014-05-31']
-rol_recover = rol_recover['2014-05-01':'2014-05-31']
-print(ts)
-print(rol_recover)
+m = err(ts.values[8:], rol_recover.values[8:])
 
-
-
-
+print('RMSE', m)

@@ -1,3 +1,6 @@
+'''
+赎回的lstm
+'''
 import numpy
 import matplotlib.pyplot as plt
 from pandas import read_csv
@@ -7,18 +10,27 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
+from keras.models import Sequential
+
 import pandas as pd
 from sklearn.externals import joblib
 import os
 
 # X is the number of passengers at a given time (t) and Y is the number of passengers at the next time (t + 1).
 # convert an array of values into a dataset matrix
-def create_dataset(dataset, look_back=1):
+def err(true,predicted):
+    err = 0
+    for i in range(len(true)):
+        tmp = (true[i]-predicted[i])/true[i]
+        err += tmp*tmp
+    standard_err = math.sqrt(err/len(true))
+    return standard_err
+
+def create_dataset(dataset_X, dataset_Y, look_back=1):
     dataX, dataY = [], []
-    for i in range(len(dataset)-look_back-1):
-        a = dataset[i:(i+look_back), 0]
-        dataX.append(a)
-        dataY.append(dataset[i + look_back, 0])
+    dataX = dataset_X[0:len(dataset_Y)-look_back-1]
+    for i in range(len(dataset_Y)-look_back-1):
+        dataY.append(dataset_Y[i + look_back, 0])
     return numpy.array(dataX), numpy.array(dataY)
 
 # # load the dataset
@@ -28,14 +40,16 @@ def create_dataset(dataset, look_back=1):
 # plt.plot(dataset)
 # plt.show()
 
-dataframe = read_csv('../file/grouped.csv', usecols=[5], engine='python', skipfooter=3)
+dataframe = read_csv('../file/grouped.csv', usecols=[7], engine='python', skipfooter=3)
 dataset = dataframe.values
-print(dataset)
 dataset = dataset.astype('float64')
 plt.plot(dataset)
 plt.show()
 
-print(dataset)
+dataframe_mulfeature = read_csv('../file/grouped.csv', usecols=[1,2,3,4,5,6,7,8,9,10,11,12], engine='python', skipfooter=3)
+dataset_mulfeature = dataframe_mulfeature.values
+dataset_mulfeature = dataset_mulfeature.astype('float64')
+
 
 # fix random seed for reproducibility
 numpy.random.seed(7)
@@ -43,26 +57,32 @@ numpy.random.seed(7)
 # normalize the dataset
 scaler = MinMaxScaler(feature_range=(0, 1))
 dataset = scaler.fit_transform(dataset)
-print(dataset)
-print(dataset)
+scaler2 = MinMaxScaler(feature_range=(0, 1))
+dataset_mulfeature = scaler2.fit_transform(dataset_mulfeature)
 
 # split into train and test sets
 train_size = int(len(dataset) * 0.67)
 test_size = len(dataset) - train_size
-train, test = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
-
+train_x, test_x = dataset_mulfeature[0:train_size,:], dataset_mulfeature[train_size:len(dataset),:]
+train_y,test_y = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
 # use this function to prepare the train and test datasets for modeling
 look_back = 1
-trainX, trainY = create_dataset(train, look_back)
-testX, testY = create_dataset(test, look_back)
+trainX, trainY = create_dataset(train_x,train_y, look_back)
+testX, testY = create_dataset(test_x,test_y, look_back)
 
 # reshape input to be [samples, time steps, features]
 trainX = numpy.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1]))
 testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
 
+print("trainX",trainX.shape)
+print("trainY",trainY.shape)
+print("testX",testX.shape)
+print("testY",testY.shape)
+
 # create and fit the LSTM network
-model = keras.Sequential()
-model.add(LSTM(4, input_shape=(1, look_back)))
+model = Sequential()
+model.add(LSTM(16, input_shape=(1, 12)))
+model.add(Dense(1))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 print(model.summary())
@@ -70,7 +90,7 @@ myfile = os.path.exists("lstm.model")
 if myfile:
     print("ssss")
 else:
-    model_prob = model.fit(trainX, trainY, epochs=100, batch_size=1, verbose=2)
+    model_prob = model.fit(trainX, trainY, epochs=105, batch_size=1, verbose=2)
     trainPredict = model.predict(trainX)
     testPredict = model.predict(testX)
     trainPredict = scaler.inverse_transform(trainPredict)
@@ -90,11 +110,12 @@ else:
 # testPredict = scaler.inverse_transform(testPredict)
 # testY = scaler.inverse_transform([testY])
 
-trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0])/trainY)
+trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
 print('Train Score: %.2f RMSE' % (trainScore))
-testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0])/len(testY))
+testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
 print('Test Score: %.2f RMSE' % (testScore))
-
+errs = err(testY[0],testPredict[:,0])
+print("errs:",errs)
 # shift train predictions for plotting
 trainPredictPlot = numpy.empty_like(dataset)
 trainPredictPlot[:, :] = numpy.nan
