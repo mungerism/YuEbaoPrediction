@@ -18,6 +18,14 @@ import os
 
 # X is the number of passengers at a given time (t) and Y is the number of passengers at the next time (t + 1).
 # convert an array of values into a dataset matrix
+def err(true,predicted):
+    err = 0
+    for i in range(len(true)):
+        tmp = (true[i]-predicted[i])/true[i]
+        err += tmp*tmp
+    standard_err = math.sqrt(err/len(true))
+    return standard_err
+
 def create_dataset(dataset_X, dataset_Y, look_back=1):
     dataX, dataY = [], []
     dataX = dataset_X[0:len(dataset_Y)-look_back-1]
@@ -32,13 +40,13 @@ def create_dataset(dataset_X, dataset_Y, look_back=1):
 # plt.plot(dataset)
 # plt.show()
 
-dataframe = read_csv('../file/hybrid_total_redeem.csv', usecols=[7], engine='python', skipfooter=3)
+dataframe = read_csv('../file/grouped.csv', usecols=[7], engine='python', skipfooter=3)
 dataset = dataframe.values
 dataset = dataset.astype('float64')
 plt.plot(dataset)
 plt.show()
 
-dataframe_mulfeature = read_csv('../file/hybrid_total_redeem.csv', usecols=[1,2,3,4,5,6,7,8,9,10,11,12], engine='python', skipfooter=3)
+dataframe_mulfeature = read_csv('../file/grouped.csv', usecols=[1,2,3,4,5,6,7,8,9,10,11,12], engine='python', skipfooter=3)
 dataset_mulfeature = dataframe_mulfeature.values
 dataset_mulfeature = dataset_mulfeature.astype('float64')
 
@@ -73,7 +81,8 @@ print("testY",testY.shape)
 
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(10, input_shape=(1, 12)))
+model.add(LSTM(16, input_shape=(1, 12)))
+model.add(Dense(1))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 print(model.summary())
@@ -106,6 +115,7 @@ print('Train Score: %.2f RMSE' % (trainScore))
 testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
 print('Test Score: %.2f RMSE' % (testScore))
 errs = err(testY[0],testPredict[:,0])
+print("errs:",errs)
 # shift train predictions for plotting
 trainPredictPlot = numpy.empty_like(dataset)
 trainPredictPlot[:, :] = numpy.nan
