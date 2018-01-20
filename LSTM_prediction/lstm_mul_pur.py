@@ -18,13 +18,8 @@ import os
 
 # X is the number of passengers at a given time (t) and Y is the number of passengers at the next time (t + 1).
 # convert an array of values into a dataset matrix
-def err(true,predicted):
-    err = 0
-    for i in range(len(true)):
-        tmp = (true[i]-predicted[i])/true[i]
-        err += tmp*tmp
-    standard_err = math.sqrt(err/len(true))
-    return standard_err
+def err(y_true, y_pred):
+    return numpy.mean(numpy.abs((y_true - y_pred) / y_true))
 
 def create_dataset(dataset_X, dataset_Y, look_back=1):
     dataX, dataY = [], []
@@ -114,6 +109,11 @@ trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
 print('Train Score: %.2f RMSE' % (trainScore))
 testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
 print('Test Score: %.2f RMSE' % (testScore))
+
+trainData = pd.DataFrame(trainPredict[:,0])
+testData = pd.DataFrame(testPredict[:,0])
+trainData.to_csv("train.csv")
+testData.to_csv("test.csv")
 errs = err(testY[0],testPredict[:,0])
 print("errs:",errs)
 # shift train predictions for plotting
