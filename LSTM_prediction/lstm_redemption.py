@@ -15,13 +15,8 @@ from keras.models import Sequential
 import pandas as pd
 from sklearn.externals import joblib
 import os
-def err(true,predicted):
-    err = 0
-    for i in range(len(true)):
-        tmp = (true[i]-predicted[i])/true[i]
-        err += tmp*tmp
-    standard_err = np.sqrt(err/len(true))
-    return standard_err
+def err(y_true, y_pred):
+    return np.mean(np.abs((y_true - y_pred) / y_true))
 
 # X is the number of passengers at a given time (t) and Y is the number of passengers at the next time (t + 1).
 # convert an array of values into a dataset matrix
@@ -40,7 +35,7 @@ def create_dataset(dataset, look_back=1):
 # plt.plot(dataset)
 # plt.show()
 
-dataframe = read_csv('../file/hybrid_total_redeem.csv', usecols=[7], engine='python', skipfooter=3)
+dataframe = read_csv('../file/grouped.csv', usecols=[7], engine='python', skipfooter=3)
 dataset = dataframe.values
 print(dataset)
 dataset = dataset.astype('float64')
@@ -108,6 +103,10 @@ print('Train Score: %.2f RMSE' % (trainScore))
 testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
 print('Test Score: %.2f RMSE' % (testScore))
 
+trainData = pd.DataFrame({'trainpredict':trainPredict[:,0],'actual':trainY[0]})
+testData = pd.DataFrame({'testpredict':testPredict[:,0],'actual':testY[0]})
+trainData.to_csv("train.csv")
+testData.to_csv("test.csv")
 # shift train predictions for plotting
 trainPredictPlot = np.empty_like(dataset)
 trainPredictPlot[:, :] = np.nan
