@@ -34,7 +34,7 @@ def err(true,predicted):
     standard_err = math.sqrt(err/len(true))
     return standard_err
 
-dataframe = read_csv('../file/grouped.csv', usecols=[4], engine='python', skipfooter=3)
+dataframe = read_csv('../file/group_by_date.csv', usecols=[4], engine='python', skipfooter=3)
 dataset = dataframe.values
 print(dataset)
 dataset = dataset.astype('float64')
