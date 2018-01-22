@@ -41,7 +41,7 @@ dataset = dataset.astype('float64')
 plt.plot(dataset)
 plt.show()
 
-dataframe_mulfeature = read_csv('../file/grouped.csv', usecols=[1,2,3,4,5,6,7,8,9,10,11,12], engine='python', skipfooter=3)
+dataframe_mulfeature = read_csv('../file/grouped.csv', usecols=[5,7,9,11], engine='python', skipfooter=3)
 dataset_mulfeature = dataframe_mulfeature.values
 dataset_mulfeature = dataset_mulfeature.astype('float64')
 
@@ -76,7 +76,7 @@ print("testY",testY.shape)
 
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(16, input_shape=(1, 12)))
+model.add(LSTM(16, input_shape=(1, 4)))
 model.add(Dense(1))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
