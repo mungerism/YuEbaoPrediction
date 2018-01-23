@@ -20,7 +20,7 @@ def err(y_true, y_pred):
 
 # X is the number of passengers at a given time (t) and Y is the number of passengers at the next time (t + 1).
 # convert an array of values into a dataset matrix
-def create_dataset(dataset, look_back=7):
+def create_dataset(dataset, look_back=1):
     dataX, dataY = [], []
     for i in range(len(dataset)-look_back-1):
         a = dataset[i:(i+look_back), 0]
@@ -35,7 +35,7 @@ def create_dataset(dataset, look_back=7):
 # plt.plot(dataset)
 # plt.show()
 
-dataframe = read_csv('../file/grouped.csv', usecols=[7], engine='python')
+dataframe = read_csv('../file/group_by_date.csv', usecols=[7], engine='python')
 dataset = dataframe.values
 print(dataset)
 dataset = dataset.astype('float64')
