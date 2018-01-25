@@ -15,7 +15,7 @@ from sklearn.externals import joblib
 import os
 def err(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true))
-dataframe = read_csv('../file/Gridsearchtask3.csv', engine='python')
+dataframe = read_csv('../file/mix/Gridsearchtask3.csv', engine='python')
 dataset = dataframe.values
 actual_redeem = dataset[:,1]
 lstm = dataset[:,2]
