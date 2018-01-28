@@ -105,8 +105,8 @@ print('Test Score: %.2f RMSE' % (testScore))
 
 trainData = pd.DataFrame({'trainpredict':trainPredict[:,0],'actual':trainY[0]})
 testData = pd.DataFrame({'testpredict':testPredict[:,0],'actual':testY[0]})
-trainData.to_csv("train.csv")
-testData.to_csv("test.csv")
+trainData.to_csv("train_redeem.csv")
+testData.to_csv("test_redeem.csv")
 # shift train predictions for plotting
 trainPredictPlot = np.empty_like(dataset)
 trainPredictPlot[:, :] = np.nan

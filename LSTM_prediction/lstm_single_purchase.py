@@ -35,7 +35,7 @@ def create_dataset(dataset, look_back=1):
 # plt.plot(dataset)
 # plt.show()
 
-dataframe = read_csv('../file/group_by_date.csv', usecols=[4], engine='python')
+dataframe = read_csv('../file/group_by_date.csv', usecols=[3], engine='python')
 dataset = dataframe.values
 print(dataset)
 dataset = dataset.astype('float64')

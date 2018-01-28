@@ -30,27 +30,27 @@ def test_stationarity(timeseries):
         dfoutput['Critical Value (%s)' % key] = value
     print(dfoutput)
 
-dataframe = read_csv('../file/final_data/arima/ARIMA_redeem.csv', engine='python')
+dataframe = read_csv('../file/final_data/lstm/pur_lookback9/all_purchase.csv', engine='python')
 # dataset = dataframe.values
 
-sub_total_purchase_residual = dataframe['residual2']
-
+sub_total_purchase_residual_tmp = dataframe['residual']
+sub_total_purchase_residual  = sub_total_purchase_residual_tmp[160:]
 print(sub_total_purchase_residual.describe())
 
 test_stationarity(sub_total_purchase_residual)
 sub_total_purchase_residual.describe()
 sub_total_purchase_residual.plot()
-plt.title('Redeem Residual By Arima')
+plt.title('Purchase Residual By Lstm')
 plt.show()
 
 # 直方图 是否正态分布
 sub_total_purchase_residual.hist()
-plt.title('Redeem Residual Histogram By Arima')
+plt.title('Purchase Residual Histogram By Lstm')
 plt.show()
 
 # autocorrelation
 plot_acf(sub_total_purchase_residual, ax=plt.gca(), lags=60)
-plt.title('Redeem Residual ACF By Arima')
+plt.title('Purchase Residual ACF By Lstm')
 plt.show()
 
 # LBQ 检验
