@@ -1,18 +1,10 @@
-
+'''
+using gridsearch method to combine data
+'''
 import numpy as np
-import matplotlib.pyplot as plt
 from pandas import read_csv
-import math
-import keras.models
-from keras.layers import Dense
-from keras.layers import LSTM
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_squared_error
-from keras.models import Sequential
-
 import pandas as pd
-from sklearn.externals import joblib
-import os
+
 def err(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true))
 dataframe = read_csv('../file/mix/2122mix.csv', engine='python')
