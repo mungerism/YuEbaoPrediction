@@ -35,13 +35,13 @@ def create_dataset(dataset_X, dataset_Y, look_back=1):
 # plt.plot(dataset)
 # plt.show()
 
-dataframe = read_csv('../file/group_by_date.csv', usecols=[7], engine='python', skipfooter=3)
+dataframe = read_csv('../file/group_by_date.csv', usecols=[3], engine='python', skipfooter=3)
 dataset = dataframe.values
 dataset = dataset.astype('float64')
 plt.plot(dataset)
 plt.show()
 
-dataframe_mulfeature = read_csv('../file/group_by_date.csv', usecols=[1,2,3,4,5,6,7,8,9,10,11,12], engine='python', skipfooter=3)
+dataframe_mulfeature = read_csv('../file/group_by_date.csv', usecols=[1,2,3,4,5,6,7,8,9], engine='python', skipfooter=3)
 dataset_mulfeature = dataframe_mulfeature.values
 dataset_mulfeature = dataset_mulfeature.astype('float64')
 
@@ -60,7 +60,7 @@ test_size = len(dataset) - train_size
 train_x, test_x = dataset_mulfeature[0:train_size,:], dataset_mulfeature[train_size:len(dataset),:]
 train_y,test_y = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
 # use this function to prepare the train and test datasets for modeling
-look_back = 1
+look_back = 7
 trainX, trainY = create_dataset(train_x,train_y, look_back)
 testX, testY = create_dataset(test_x,test_y, look_back)
 
@@ -75,8 +75,7 @@ print("testY",testY.shape)
 
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(16, input_shape=(1, 12)))
-model.add(Dense(1))
+model.add(LSTM(4, input_shape=(1, 9)))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 print(model.summary())
