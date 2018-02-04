@@ -36,14 +36,18 @@ def create_dataset(dataset, look_back=1):
 # plt.show()
 
 dataframe = read_csv('../file/group_by_date.csv', usecols=[7], engine='python')
+df = read_csv('../file/group_by_date.csv', index_col='report_date', parse_dates=[0])
+
 dataset = dataframe.values
 print(dataset)
 dataset = dataset.astype('float64')
 plt.plot(dataset)
 plt.show()
 
-print(dataset)
-
+total_redeem_amt_ts = df['total_redeem_amt']
+plt.plot(total_redeem_amt_ts)
+plt.title('Total redeem amt')
+plt.show
 # fix random seed for reproducibility
 np.random.seed(7)
 
@@ -118,8 +122,10 @@ testPredictPlot[:, :] = np.nan
 testPredictPlot[len(trainPredict)+(look_back*2)+1:len(dataset)-1, :] = testPredict
 
 # plot baseline and predictions
-plt.plot(scaler.inverse_transform(dataset))
-plt.plot(trainPredictPlot)
-plt.plot(testPredictPlot)
+# plt.plot(scaler.inverse_transform(dataset))
+plt.plot(total_redeem_amt_ts)
+
+# plt.plot(trainPredictPlot)
+# plt.plot(testPredictPlot)
 plt.show()
 

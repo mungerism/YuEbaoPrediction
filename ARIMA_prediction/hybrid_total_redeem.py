@@ -70,7 +70,6 @@ def test_stationarity(timeseries):
         dfoutput['Critical Value (%s)' % key] = value
     print(dfoutput)
 
-
 def proper_model(ts_log_diff, maxLag):
     best_p = 0
     best_q = 0
@@ -120,7 +119,6 @@ diff_1.plot()
 plt.title('Total redeem first difference')
 
 plt.show()
-
 
 plt.figure()
 plt.axhline(y=-1.96/np.sqrt(len(total_redeem_original)), linestyle='--', color='gray')
@@ -207,7 +205,6 @@ df = df[8:]
 df['total_redeem_amt'] = total_redeem_residual_values
 df.to_csv('../file/hybrid_total_redeem.csv')
 # print(total_redeem_residual_values)
-
 
 
 '''
