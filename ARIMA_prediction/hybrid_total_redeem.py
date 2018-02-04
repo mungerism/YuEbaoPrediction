@@ -107,7 +107,7 @@ total_redeem_original = df['total_redeem_amt']
 # ts = ts['2014-04-01':'2014-06-30']
 
 # print('原数据ADF')
-# test_stationarity(ts)
+# stationarity_test(ts)
 
 total_redeem_original.plot()
 plt.title('Total Redeem')

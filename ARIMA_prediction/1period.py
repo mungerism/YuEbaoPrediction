@@ -85,7 +85,7 @@ plt.show()
 
 # differenced = differenced.diff(1)
 # differenced = differenced[1:]
-# test_stationarity(differenced)
+# stationarity_test(differenced)
 # differenced.plot()
 # plt.title('Total purchase Second difference')
 # plt.show()
