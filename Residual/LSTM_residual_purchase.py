@@ -28,7 +28,7 @@ def stationarity_test(timeseries):
         dfoutput['Critical Value (%s)' % key] = value
     print(dfoutput)
 
-dataframe = read_csv('../file/final_data/lstm/purchase/all_purchase.csv', engine='python')
+dataframe = read_csv('../file/final_data/lstm/purchase/all_purchase.csv', index_col='date', parse_dates=[0])
 # dataset = dataframe.values
 
 sub_total_purchase_residual_tmp = dataframe['residual']

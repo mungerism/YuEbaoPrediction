@@ -9,7 +9,7 @@ import sys
 from statsmodels.tsa.arima_model import ARMA
 def err(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true))
-def test_stationarity(timeseries):
+def stationarity_test(timeseries):
     # Determing rolling statistics
     rolmean = pd.rolling_mean(timeseries, window=30)
     rolstd = pd.rolling_std(timeseries, window=30)
@@ -30,14 +30,14 @@ def test_stationarity(timeseries):
         dfoutput['Critical Value (%s)' % key] = value
     print(dfoutput)
 
-dataframe = read_csv('../file/final_data//lstm/redeem/lstm_redeem.csv', engine='python')
+dataframe = read_csv('../file/final_data/lstm/redeem/lstm_redeem.csv', index_col='report_date', parse_dates=[0])
 # dataset = dataframe.values
 
 sub_total_purchase_residual = dataframe['residual']
 
 print(sub_total_purchase_residual.describe())
 
-test_stationarity(sub_total_purchase_residual)
+stationarity_test(sub_total_purchase_residual)
 sub_total_purchase_residual.describe()
 sub_total_purchase_residual.plot()
 plt.title('Redeem Residual By Lstm')
