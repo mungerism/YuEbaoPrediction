@@ -41,13 +41,12 @@ df = read_csv('../file/group_by_date.csv', index_col='report_date', parse_dates=
 dataset = dataframe.values
 print(dataset)
 dataset = dataset.astype('float64')
-plt.plot(dataset)
-plt.show()
+
 
 total_redeem_amt_ts = df['total_redeem_amt']
 plt.plot(total_redeem_amt_ts)
 plt.title('Total redeem amt')
-plt.show
+plt.show()
 # fix random seed for reproducibility
 np.random.seed(7)
 
@@ -123,9 +122,16 @@ testPredictPlot[len(trainPredict)+(look_back*2)+1:len(dataset)-1, :] = testPredi
 
 # plot baseline and predictions
 # plt.plot(scaler.inverse_transform(dataset))
-plt.plot(total_redeem_amt_ts)
 
-# plt.plot(trainPredictPlot)
-# plt.plot(testPredictPlot)
+date_trainPredictPlot = pd.DataFrame(data=trainPredictPlot, index=total_redeem_amt_ts.index, columns=['value'])
+date_testPredictPlot = pd.DataFrame(data=testPredictPlot, index=total_redeem_amt_ts.index, columns=['value'])
+plt.plot(total_redeem_amt_ts, label='original')
+plt.plot(date_testPredictPlot, label='test')
+plt.plot(date_trainPredictPlot,  label='train')
+plt.legend(loc='best')
+plt.title('LSTM redeem prediction')
 plt.show()
+ # pd.DataFrame(data=data[1:,1:],    # values
+ #              index=data[1:,0],    # 1st column as index
+ #              columns=data[0,1:])  # 1st row as the column names
 
