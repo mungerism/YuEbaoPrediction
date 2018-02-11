@@ -33,7 +33,7 @@ def stationarity_test(timeseries):
 dataframe = read_csv('../file/final_data/lstm/redeem/lstm_redeem.csv', index_col='report_date', parse_dates=[0])
 # dataset = dataframe.values
 
-sub_total_purchase_residual = dataframe['residual']
+sub_total_purchase_residual = dataframe['residual_before']
 
 print(sub_total_purchase_residual.describe())
 
