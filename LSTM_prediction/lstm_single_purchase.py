@@ -36,10 +36,17 @@ def create_dataset(dataset, look_back=1):
 # plt.show()
 
 dataframe = read_csv('../file/group_by_date.csv', usecols=[3], engine='python')
+df = read_csv('../file/group_by_date.csv', index_col='report_date', parse_dates=[0])
+
 dataset = dataframe.values
 print(dataset)
 dataset = dataset.astype('float64')
 plt.plot(dataset)
+plt.show()
+
+total_purchase_amt_ts = df['total_purchase_amt']
+plt.plot(total_purchase_amt_ts)
+plt.title('Total purchase amt')
 plt.show()
 
 print(dataset)
@@ -59,7 +66,7 @@ test_size = len(dataset) - train_size
 train, test = dataset[0:train_size,:], dataset[train_size:len(dataset),:]
 
 # use this function to prepare the train and test datasets for modeling
-look_back = 9
+look_back = 7
 trainX, trainY = create_dataset(train, look_back)
 testX, testY = create_dataset(test, look_back)
 
@@ -118,9 +125,17 @@ testPredictPlot = np.empty_like(dataset)
 testPredictPlot[:, :] = np.nan
 testPredictPlot[len(trainPredict)+(look_back*2)+1:len(dataset)-1, :] = testPredict
 
-# plot baseline and predictions
-plt.plot(scaler.inverse_transform(dataset))
-plt.plot(trainPredictPlot)
-plt.plot(testPredictPlot)
-plt.show()
+# # plot baseline and predictions
+# plt.plot(scaler.inverse_transform(dataset))
+# plt.plot(trainPredictPlot)
+# plt.plot(testPredictPlot)
+# plt.show()
 
+date_trainPredictPlot = pd.DataFrame(data=trainPredictPlot, index=total_purchase_amt_ts.index, columns=['value'])
+date_testPredictPlot = pd.DataFrame(data=testPredictPlot, index=total_purchase_amt_ts.index, columns=['value'])
+plt.plot(total_purchase_amt_ts, label='original')
+plt.plot(date_testPredictPlot, label='test')
+plt.plot(date_trainPredictPlot,  label='train')
+plt.legend(loc='best')
+plt.title('LSTM purchase prediction')
+plt.show()
