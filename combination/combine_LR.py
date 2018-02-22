@@ -8,7 +8,7 @@ from sklearn import linear_model
 from sklearn.linear_model import LogisticRegression
 def err(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true))
-dataframe = read_csv('../file/final_data/mix/redeem/arima_lstm.csv', engine='python')
+dataframe = read_csv('../file/mix/0222redeem.csv', engine='python')
 dataset = dataframe.values
 label = dataset[:,1]
 lstm = dataset[:,2]
@@ -21,6 +21,9 @@ f = np.transpose(f)
 regr.fit(f, label)
 # lr.fit(f, label)
 final = regr.predict(f)
-err = err(label[270:],final[270:])
+mix_data = pd.DataFrame({'date':dataset[:,0],'actual_data':label,'logistic':final})
+# mix_data.to_csv("0222logistic_purchase.csv")
+mix_data.to_csv("0222logistic_redeem.csv")
+err = err(label,final)
 print(err)
 print(222)

@@ -28,27 +28,27 @@ def stationarity_test(timeseries):
         dfoutput['Critical Value (%s)' % key] = value
     print(dfoutput)
 
-dataframe = read_csv('../file/final_data/lstm/purchase/all_purchase230.csv', index_col='report_date', parse_dates=[0])
+dataframe = read_csv('../combination/0222logistic_purchase.csv', index_col='date', parse_dates=[0])
 # dataset = dataframe.values
 
-sub_total_purchase_residual_tmp = dataframe['residual2']
+sub_total_purchase_residual_tmp = dataframe['residual']
 sub_total_purchase_residual  = sub_total_purchase_residual_tmp[:]
 print(sub_total_purchase_residual.describe())
 
 stationarity_test(sub_total_purchase_residual)
 sub_total_purchase_residual.describe()
 sub_total_purchase_residual.plot()
-plt.title('Purchase Residual By Lstm')
+plt.title('Purchase Residual By Hybrid')
 plt.show()
 
 # 直方图 是否正态分布
 sub_total_purchase_residual.hist()
-plt.title('Purchase Residual Histogram By Lstm')
+plt.title('Purchase Residual Histogram By Hybrid')
 plt.show()
 
 # autocorrelation
 plot_acf(sub_total_purchase_residual, ax=plt.gca(), lags=60)
-plt.title('Purchase Residual ACF By Lstm')
+plt.title('Purchase Residual ACF By Hybrid')
 plt.show()
 
 # LBQ 检验
